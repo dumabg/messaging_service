@@ -76,11 +76,11 @@ abstract class MessagingService {
     if (_firebaseMessaging == null) {
       _initMessaging();
     }
-    _firebaseMessaging!.requestPermission();
+    await _firebaseMessaging!.requestPermission();
     try {
       _token = await _firebaseMessaging!.getToken(vapidKey: vapidKey);
       _hasPermission = true;
-      onTokenRefresh();
+      await onTokenRefresh();
     } on FirebaseException catch (e) {
       if ((e.plugin == 'firebase_messaging') &&
           (e.code == 'permission-blocked')) {
