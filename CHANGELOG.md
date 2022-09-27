@@ -1,8 +1,12 @@
-## 1.0.2
-License information
+## 1.0.4
+Upgrade firebase_messaging to 13.0.3
+Upgrade firebase_core to 1.23.0
 
 ## 1.0.3
 Upgrade firebase_messaging to 12.0.0
+
+## 1.0.2
+License information
 
 ## 1.0.1
 Test & documentation
