@@ -1,3 +1,7 @@
+## 1.0.5
+Upgrade firebase_messaging to 14.2.1
+Upgrade firebase_core to 2.4.1
+
 ## 1.0.4
 Upgrade firebase_messaging to 13.0.3
 Upgrade firebase_core to 1.23.0
