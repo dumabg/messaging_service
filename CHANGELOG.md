@@ -1,3 +1,6 @@
+## 1.2.0
+Upgrade firebase_messaging and firebase_core to any
+
 ## 1.14.2
 Upgrade firebase_messaging to 14.2.2
 Change version nomenclature to avoid cache problems. Now the subversion and patch number corresponds to firebase_messaging version.
