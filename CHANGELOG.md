@@ -1,3 +1,6 @@
+## 1.2.1
+Correct bug on iOS. Throws "firebase_messaging/unknown: A server with the specified hostname could not be found"
+
 ## 1.2.0
 Upgrade firebase_messaging and firebase_core to any
 
