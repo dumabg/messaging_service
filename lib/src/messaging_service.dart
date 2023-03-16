@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'messaging_dispatcher.dart';
@@ -76,20 +75,11 @@ abstract class MessagingService {
     if (_firebaseMessaging == null) {
       _initMessaging();
     }
-    await _firebaseMessaging!.requestPermission();
-    try {
-      _token = await _firebaseMessaging!.getToken(vapidKey: vapidKey);
-      _hasPermission = true;
-      await onTokenRefresh();
-    } on FirebaseException catch (e) {
-      if ((e.plugin == 'firebase_messaging') &&
-          (e.code == 'permission-blocked')) {
-        _hasPermission = false;
-        _token = null;
-      } else {
-        rethrow;
-      }
-    }
+    NotificationSettings response =
+        await _firebaseMessaging!.requestPermission();
+    _hasPermission =
+        (response.authorizationStatus == AuthorizationStatus.authorized) ||
+            (response.authorizationStatus == AuthorizationStatus.provisional);
   }
 
   /// Stops receiving messages. FirebaseMessaging is destroyed. To return to
