@@ -14,7 +14,7 @@ class MessagingTestDispatcher extends MessagingDispatcher<MessageTest> {
 
   @override
   MessageTest getMessage(RemoteMessage message) {
-    return MessageTest(message.data['value']);
+    return MessageTest(message.data['value'] as String);
   }
 }
 
@@ -29,7 +29,7 @@ class ChatTestDispatcher extends MessagingDispatcher<ChatMessageTest> {
 
   @override
   ChatMessageTest getMessage(RemoteMessage message) {
-    return ChatMessageTest(message.data['text']);
+    return ChatMessageTest(message.data['text'] as String);
   }
 }
 
@@ -49,19 +49,19 @@ class MockMessagingService extends MessagingService {
 }
 
 void main() {
-  var messagingService = MockMessagingService();
+  final messagingService = MockMessagingService();
   group('One dispatcher', () {
-    var messagingTestDispatcher = MessagingTestDispatcher();
+    final messagingTestDispatcher = MessagingTestDispatcher();
     messagingService.registerDispatcher<MessageTest>(messagingTestDispatcher);
     test('Stream', () async {
-      Completer completer1 = Completer();
-      Completer completer2 = Completer();
-      var subscription1 =
+      final completer1 = Completer<void>();
+      final completer2 = Completer<void>();
+      final subscription1 =
           messagingService.messagingTest().listen((MessageTest message) {
         expect(message.value, '0');
         completer1.complete();
       });
-      var subscription2 =
+      final subscription2 =
           messagingService.messagingTest().listen((MessageTest message) {
         expect(message.value, '0');
         completer2.complete();
@@ -71,8 +71,8 @@ void main() {
         'data': {'type': 'test', 'value': '0'}
       }));
       await Future.wait([completer1.future, completer2.future]);
-      subscription1.cancel();
-      subscription2.cancel();
+      await subscription1.cancel();
+      await subscription2.cancel();
     });
 
     test('Message not dispatched', () {
@@ -84,29 +84,30 @@ void main() {
   });
 
   test('Two dispatchers', () async {
-    var chatTestDispatcher = ChatTestDispatcher();
+    final chatTestDispatcher = ChatTestDispatcher();
     messagingService.registerDispatcher<ChatMessageTest>(chatTestDispatcher);
-    Completer completer1 = Completer();
-    Completer completer2 = Completer();
-    var subscription1 =
+    final completer1 = Completer<void>();
+    final completer2 = Completer<void>();
+    final subscription1 =
         messagingService.messagingChat().listen((ChatMessageTest message) {
       expect(message.text, 'Hola mundo');
       completer1.complete();
     });
-    var subscription2 =
+    final subscription2 =
         messagingService.messagingTest().listen((MessageTest message) {
       expect(message.value, '0');
       completer2.complete();
     });
     // Simulate than a message arrives
-    messagingService.dispatch(RemoteMessage.fromMap({
-      'data': {'type': 'test', 'value': '0'}
-    }));
-    messagingService.dispatch(RemoteMessage.fromMap({
-      'data': {'type': 'chat', 'text': 'Hola mundo'}
-    }));
+    messagingService
+      ..dispatch(RemoteMessage.fromMap({
+        'data': {'type': 'test', 'value': '0'}
+      }))
+      ..dispatch(RemoteMessage.fromMap({
+        'data': {'type': 'chat', 'text': 'Hola mundo'}
+      }));
     await Future.wait([completer1.future, completer2.future]);
-    subscription1.cancel();
-    subscription2.cancel();
+    await subscription1.cancel();
+    await subscription2.cancel();
   });
 }

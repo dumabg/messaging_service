@@ -21,7 +21,7 @@ abstract class MessagingService {
   /// True if the user accepted receive messages.
   bool get hasPermission => _hasPermission;
 
-  final Map<Type, MessagingDispatcher> _dispatchers = {};
+  final Map<Type, MessagingDispatcher<dynamic>> _dispatchers = {};
 
   /// Initialize FirebaseMessaging and request permission
   Future<void> initialize() async {
@@ -50,10 +50,10 @@ abstract class MessagingService {
     _firebaseMessaging = FirebaseMessaging.instance;
     _messagingStream = FirebaseMessaging.onMessage.listen(dispatch);
     _firebaseMessaging!.onTokenRefresh.listen(
-      (String token) {
+      (String token) async {
         if (_token != token) {
           _token = token;
-          onTokenRefresh();
+          await onTokenRefresh();
         }
         _hasPermission = true;
       },
@@ -61,7 +61,7 @@ abstract class MessagingService {
   }
 
   void dispatch(RemoteMessage message) {
-    for (MessagingDispatcher dispatcher in _dispatchers.values) {
+    for (final MessagingDispatcher<dynamic> dispatcher in _dispatchers.values) {
       if (dispatcher.dispatch(message)) {
         return;
       }
@@ -75,7 +75,7 @@ abstract class MessagingService {
     if (_firebaseMessaging == null) {
       _initMessaging();
     }
-    NotificationSettings response =
+    final NotificationSettings response =
         await _firebaseMessaging!.requestPermission();
     _hasPermission =
         (response.authorizationStatus == AuthorizationStatus.authorized) ||

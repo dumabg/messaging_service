@@ -14,13 +14,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 ///
 /// [T] is the class of the message that will be produced.
 ///
-/// To identify the message, the dispatcher tries to find a field with a specific value
-/// in the [data] of the Firebase Messaging [RemoteMessage]. The field key and value could be
-/// defined using the constructor. By default, the field key is 'type'.
+/// To identify the message, the dispatcher tries to find a field with a
+/// specific value in the [data] of the Firebase Messaging [RemoteMessage].
+/// The field key and value could be defined using the constructor.
+/// By default, the field key is 'type'.
 ///
-/// Example: Chat messages are identified by the field key 'type' with the value 'chat'.
-///   See the super on constructor, that pass 'chat' (the value 'type' for the field key
-///  is, by default, 'type').
+/// Example: Chat messages are identified by the field key 'type' with the value
+///  'chat'. See the super on constructor, that pass 'chat' (the value 'type'
+///  for the field key is, by default, 'type').
 ///
 /// ```dart
 ///
@@ -54,8 +55,8 @@ abstract class MessagingDispatcher<T> {
   T getMessage(RemoteMessage message);
 
   bool dispatch(RemoteMessage message) {
-    Map<String, dynamic> data = message.data;
-    if (data.containsKey(typeKey) && ((data[typeKey] == type))) {
+    final Map<String, dynamic> data = message.data;
+    if (data.containsKey(typeKey) && (data[typeKey] == type)) {
       _controller.add(getMessage(message));
       return true;
     } else {
@@ -64,6 +65,6 @@ abstract class MessagingDispatcher<T> {
   }
 
   void close() {
-    _controller.close();
+    unawaited(_controller.close());
   }
 }
