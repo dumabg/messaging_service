@@ -89,4 +89,12 @@ abstract class MessagingService {
     _messagingStream = null;
     _firebaseMessaging = null;
   }
+
+  Future<void> subscribeToTopic(String topic) async {
+    await _firebaseMessaging?.subscribeToTopic(topic);
+  }
+
+  Future<void> unsubscribeFromTopic(String topic) async {
+    await _firebaseMessaging?.unsubscribeFromTopic(topic);
+  }
 }
