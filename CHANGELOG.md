@@ -1,3 +1,10 @@
+## 1.4.0
+Upgrade to last version libraries
+Build after upgrade to Flutter 3.22.1
+
+## 1.3.0
+Add topics support
+
 ## 1.2.1
 Correct bug on iOS. Throws "firebase_messaging/unknown: A server with the specified hostname could not be found"
 
