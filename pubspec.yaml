@@ -4,7 +4,7 @@ version: 1.4.0
 homepage: https://github.com/dumabg/messaging_service.git
 
 environment:
-  sdk: ">=3.4.1 <4.0.0"
+  sdk: ^3.10.4
 
 dependencies:
   firebase_core: any
@@ -15,7 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   test: ^1.19.5
 
 # For information on the generic Dart part of this file, see the
