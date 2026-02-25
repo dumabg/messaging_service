@@ -2,7 +2,15 @@ import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:messaging_service/messaging_service.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+
+class FirebaseMessagingMock extends Mock implements FirebaseMessaging {
+  FirebaseMessagingMock() {
+    when(getToken).thenAnswer((_) async => 'fake_token_123');
+    when(() => onTokenRefresh).thenAnswer((_) => Stream.fromIterable([]));
+  }
+}
 
 class MessageTest {
   final String value;
@@ -39,6 +47,8 @@ class MockMessagingService extends MessagingService {
   Stream<MessageTest> messagingTest() => stream<MessageTest>();
   Stream<ChatMessageTest> messagingChat() => stream<ChatMessageTest>();
 
+  MockMessagingService() : super(firebaseMessaging: FirebaseMessagingMock());
+
   @override
   Future<void> onTokenRefresh() async {}
 
@@ -56,29 +66,35 @@ void main() {
     test('Stream', () async {
       final completer1 = Completer<void>();
       final completer2 = Completer<void>();
-      final subscription1 =
-          messagingService.messagingTest().listen((MessageTest message) {
+      final subscription1 = messagingService.messagingTest().listen((
+        MessageTest message,
+      ) {
         expect(message.value, '0');
         completer1.complete();
       });
-      final subscription2 =
-          messagingService.messagingTest().listen((MessageTest message) {
+      final subscription2 = messagingService.messagingTest().listen((
+        MessageTest message,
+      ) {
         expect(message.value, '0');
         completer2.complete();
       });
       // Simulate than a message arrives
-      messagingService.dispatch(RemoteMessage.fromMap({
-        'data': {'type': 'test', 'value': '0'}
-      }));
+      messagingService.dispatch(
+        RemoteMessage.fromMap({
+          'data': {'type': 'test', 'value': '0'},
+        }),
+      );
       await Future.wait([completer1.future, completer2.future]);
       await subscription1.cancel();
       await subscription2.cancel();
     });
 
     test('Message not dispatched', () {
-      messagingService.dispatch(RemoteMessage.fromMap({
-        'data': {'type': 'other'}
-      }));
+      messagingService.dispatch(
+        RemoteMessage.fromMap({
+          'data': {'type': 'other'},
+        }),
+      );
       expect(messagingService.notDispatched, true);
     });
   });
@@ -88,24 +104,30 @@ void main() {
     messagingService.registerDispatcher<ChatMessageTest>(chatTestDispatcher);
     final completer1 = Completer<void>();
     final completer2 = Completer<void>();
-    final subscription1 =
-        messagingService.messagingChat().listen((ChatMessageTest message) {
+    final subscription1 = messagingService.messagingChat().listen((
+      ChatMessageTest message,
+    ) {
       expect(message.text, 'Hola mundo');
       completer1.complete();
     });
-    final subscription2 =
-        messagingService.messagingTest().listen((MessageTest message) {
+    final subscription2 = messagingService.messagingTest().listen((
+      MessageTest message,
+    ) {
       expect(message.value, '0');
       completer2.complete();
     });
     // Simulate than a message arrives
     messagingService
-      ..dispatch(RemoteMessage.fromMap({
-        'data': {'type': 'test', 'value': '0'}
-      }))
-      ..dispatch(RemoteMessage.fromMap({
-        'data': {'type': 'chat', 'text': 'Hola mundo'}
-      }));
+      ..dispatch(
+        RemoteMessage.fromMap({
+          'data': {'type': 'test', 'value': '0'},
+        }),
+      )
+      ..dispatch(
+        RemoteMessage.fromMap({
+          'data': {'type': 'chat', 'text': 'Hola mundo'},
+        }),
+      );
     await Future.wait([completer1.future, completer2.future]);
     await subscription1.cancel();
     await subscription2.cancel();
