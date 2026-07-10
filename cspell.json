@@ -1,5 +1,9 @@
 {
     "words": [
         "unawaited"
+    ],
+    "ignorePaths": [
+        "cspell.json",
+        "pubspec.yaml"
     ]
 }

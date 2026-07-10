@@ -1,10 +1,10 @@
 name: messaging_service
 description: Library for creating a messaging service for different kind of messages received from FirebaseMessaging
-version: 1.4.0
+version: 1.6.1
 homepage: https://github.com/dumabg/messaging_service.git
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.12.2
 
 dependencies:
   firebase_core: any

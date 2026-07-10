@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'messaging_dispatcher.dart';
-import 'messaging_exception.dart';
 import 'messaging_permissions.dart';
 
 /// Base class for create a messaging service based on Firebase Messaging.
@@ -35,34 +34,24 @@ abstract class MessagingService {
         await onTokenRefresh();
       }
     });
+    _messagingStream = FirebaseMessaging.onMessage.listen(dispatch);
   }
 
-  /// Initialize FirebaseMessaging and request permission
   Future<void> initialize({MessagingPermissions? permissions}) async {
+    await requestPermission(permissions);
+    unawaited(_checkForToken());
+  }
+
+  Future<void> _checkForToken() async {
     if (Platform.isIOS) {
-      await _initializeIOS(3);
+      final String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      if (apnsToken == null) {
+        // Apple isn't available, return to avoid recover the token.
+        // It always return null. When ready, onTokenRefresh will be launched.
+        return;
+      }
     }
     _token = await _firebaseMessaging.getToken();
-    _messagingStream = FirebaseMessaging.onMessage.listen(dispatch);
-    await requestPermission(permissions);
-  }
-
-  Future<void> _initializeIOS(int retries) async {
-    // For apple platforms, make sure the APNS token is available before making
-    //any FCM plugin API calls
-    final String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    if (apnsToken == null) {
-      if (retries == 0) {
-        throw MessagingException(
-          'Can'
-          't initialize iOS APNSToken',
-        );
-      }
-      // APNS token isn't available, retry.
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-      await _initializeIOS(retries - 1);
-    }
-    // APNS token is available, make FCM plugin API requests.
   }
 
   /// Register a dispatcher
